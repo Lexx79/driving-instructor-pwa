@@ -16,18 +16,24 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Bubblewrap (TWA Builder)
-        run: npm install -g @pwabuilder/bubblewrap
+      - name: Install Bubblewrap
+        run: npm install -g @bubblewrap/cli
 
-      - name: Generate Android APK
+      - name: Generate TWA APK
         run: |
           mkdir -p output
-          npx bubblewrap build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output --jvmArgs "-Xmx1024M"
+          npx @bubblewrap/cli build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output
         continue-on-error: true
 
-      - name: Find APK files
+      - name: List output files
         run: |
-          find . -name "*.apk" -o -name "*.aab" | head -20
+          find ./output -type f 2>/dev/null || echo "No output dir"
+          find /tmp -name "*.apk" -type f 2>/dev/null || echo "No APK in /tmp"
+
+      - name: Find APK everywhere
+        run: |
+          find / -name "*.apk" -type f 2>/dev/null | head -20
+        continue-on-error: true
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
