@@ -22,18 +22,12 @@ jobs:
       - name: Generate TWA APK
         run: |
           mkdir -p output
-          npx @bubblewrap/cli build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output
+          echo "y" | npx @bubblewrap/cli build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output
         continue-on-error: true
 
-      - name: List output files
-        run: |
-          find ./output -type f 2>/dev/null || echo "No output dir"
-          find /tmp -name "*.apk" -type f 2>/dev/null || echo "No APK in /tmp"
-
-      - name: Find APK everywhere
+      - name: Find APK
         run: |
           find / -name "*.apk" -type f 2>/dev/null | head -20
-        continue-on-error: true
           
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
