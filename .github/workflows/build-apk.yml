@@ -16,17 +16,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Download manifest
-        run: |
-          curl -s "https://lexx79.github.io/driving-instructor-pwa/manifest.json" -o ./manifest.json
-          cat ./manifest.json
-
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
       - name: Generate TWA APK
         run: |
           mkdir -p output
+          cat manifest.json
           yes | npx @bubblewrap/cli build --manifest "./manifest.json" --directory ./output 2>&1
         continue-on-error: true
 
