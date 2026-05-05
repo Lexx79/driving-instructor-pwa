@@ -22,7 +22,7 @@ jobs:
       - name: Generate TWA APK
         run: |
           mkdir -p output
-          echo "y" | npx @bubblewrap/cli build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output
+          printf "y\ny\n" | npx @bubblewrap/cli build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output
         continue-on-error: true
 
       - name: Find APK
