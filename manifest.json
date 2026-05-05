@@ -22,5 +22,6 @@
       "purpose": "any maskable"
     }
   ],
-  "iconUrl": "https://lexx79.github.io/driving-instructor-pwa/icon-512.png"
+  "iconUrl": "https://lexx79.github.io/driving-instructor-pwa/icon-512.png",
+  "host": "lexx79.github.io"
 }

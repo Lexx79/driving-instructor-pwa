@@ -22,8 +22,7 @@ jobs:
       - name: Generate TWA APK
         run: |
           mkdir -p output
-          cat manifest.json
-          yes | npx @bubblewrap/cli build --manifest "./manifest.json" --directory ./output 2>&1
+          printf "y\ny\n1.0\n" | npx @bubblewrap/cli build --manifest "./manifest.json" --directory ./output 2>&1
         continue-on-error: true
 
       - name: Find APK
