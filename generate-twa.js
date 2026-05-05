@@ -5,7 +5,7 @@
 const path = require('path');
 const fs = require('fs');
 
-// @bubblewrap/core is available via npm -g install @bubblewrap/cli
+// @bubblewrap/core is available as a dependency of @bubblewrap/cli
 const { TwaManifest, TwaGenerator, ConsoleLog } = require('@bubblewrap/core');
 
 async function main() {

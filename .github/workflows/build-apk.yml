@@ -22,13 +22,14 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-      - name: Generate TWA project (non-interactive API)
-        run: |
-          export NODE_PATH=$(npm root -g)
-          node generate-twa.js https://lexx79.github.io/driving-instructor-pwa/manifest.json twa-build
+      - name: Install dependencies
+        run: npm install @bubblewrap/cli --save-dev
+
+      - name: Generate TWA project
+        run: node generate-twa.js https://lexx79.github.io/driving-instructor-pwa/manifest.json twa-build
 
       - name: Build APK with Bubblewrap
         working-directory: twa-build
