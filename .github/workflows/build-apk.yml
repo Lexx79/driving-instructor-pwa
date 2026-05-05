@@ -28,13 +28,14 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Init TWA project
+      - name: Init TWA project (non-interactive)
         run: |
-          yes | npx @bubblewrap/cli init \
+          # "n" for "install JDK" and "install Android SDK" - both already installed
+          printf 'n\nn\n' | npx @bubblewrap/cli init \
             --manifest https://lexx79.github.io/driving-instructor-pwa/manifest.json \
-            --directory twa-build || true
+            --directory twa-build
           ls -la twa-build/ 2>/dev/null
-          cat twa-build/twa-manifest.json 2>/dev/null || echo "NO_TWA_MANIFEST"
+          cat twa-build/twa-manifest.json 2>/dev/null
 
       - name: Build APK
         working-directory: twa-build
