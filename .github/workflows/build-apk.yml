@@ -19,21 +19,9 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Generate TWA APK
+      - name: Check CLI options
         run: |
-          mkdir -p output
-          printf "y\ny\n1.0\n" | npx @bubblewrap/cli build --manifest "./manifest.json" --directory ./output 2>&1
+          npx @bubblewrap/cli --help 2>&1
+          echo "=== BUILD HELP ==="
+          npx @bubblewrap/cli build --help 2>&1
         continue-on-error: true
-
-      - name: Find APK
-        run: |
-          find / -name "*.apk" -type f 2>/dev/null | head -20
-          
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Autoshkola-APK
-          path: |
-            **/*.apk
-            **/*.aab
-          if-no-files-found: warn
