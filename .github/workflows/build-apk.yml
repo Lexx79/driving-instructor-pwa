@@ -25,24 +25,69 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android SDK components
+        run: |
+          SDKMANAGER=$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager
+          if [ ! -f "$SDKMANAGER" ]; then
+            SDKMANAGER=$(find $ANDROID_HOME/cmdline-tools -name sdkmanager -type f 2>/dev/null | head -1)
+          fi
+          echo "Using sdkmanager: $SDKMANAGER"
+          yes | $SDKMANAGER "platforms;android-36" "build-tools;36.0.0" || echo "SDK install done (may already exist)"
+
       - name: Install dependencies
         run: npm install
 
       - name: Generate TWA project
         run: node generate-twa.js https://lexx79.github.io/driving-instructor-pwa/manifest.json twa-build
 
-      - name: Build APK with Bubblewrap
+      - name: Create keystore
         working-directory: twa-build
-        run: npx @bubblewrap/cli build
+        run: |
+          keytool -genkey -v -keystore release.keystore \
+            -alias android -keyalg RSA -keysize 2048 \
+            -validity 10000 -storepass android -keypass android \
+            -dname "CN=Developer, OU=Dev, O=DrivingInstructor, L=Abakan, S=Khakasia, C=RU"
 
-      - name: Find APK
+      - name: Build APK with Gradle
+        working-directory: twa-build
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
+          ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
+      - name: Find unsigned APK
+        working-directory: twa-build
         run: |
           find . -name "*.apk" -type f
-          mkdir -p apk-output
-          find . -name "*.apk" -type f -exec cp {} apk-output/ \;
+
+      - name: Align and sign APK
+        working-directory: twa-build
+        run: |
+          UNSIGNED_APK=$(find . -name "app-release-unsigned.apk" -type f | head -1)
+          echo "Found APK: $UNSIGNED_APK"
+          if [ -z "$UNSIGNED_APK" ]; then
+            echo "No APK found!"
+            exit 1
+          fi
+          # Copy and zipalign
+          cp "$UNSIGNED_APK" app-unsigned-aligned.apk
+          $ANDROID_HOME/build-tools/*/zipalign -v -p 4 app-unsigned-aligned.apk app-aligned.apk
+          # Sign
+          $ANDROID_HOME/build-tools/*/apksigner sign \
+            --ks release.keystore \
+            --ks-key-alias android \
+            --ks-pass pass:android \
+            --key-pass pass:android \
+            app-aligned.apk
+          # Verify
+          $ANDROID_HOME/build-tools/*/apksigner verify app-aligned.apk
+          # Rename to final name
+          cp app-aligned.apk app-release-signed.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: driving-instructor-apk
-          path: apk-output/
+          path: twa-build/app-release-signed.apk
