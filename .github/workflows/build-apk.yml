@@ -1,0 +1,39 @@
+﻿name: Build APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Bubblewrap (TWA Builder)
+        run: npm install -g @pwabuilder/bubblewrap
+
+      - name: Generate Android APK
+        run: |
+          mkdir -p output
+          npx bubblewrap build --manifest "https://lexx79.github.io/driving-instructor-pwa/manifest.json" --directory ./output --jvmArgs "-Xmx1024M"
+        continue-on-error: true
+
+      - name: Find APK files
+        run: |
+          find . -name "*.apk" -o -name "*.aab" | head -20
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Autoshkola-APK
+          path: |
+            **/*.apk
+            **/*.aab
+          if-no-files-found: warn
