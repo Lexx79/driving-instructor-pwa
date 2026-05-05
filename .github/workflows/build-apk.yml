@@ -27,7 +27,7 @@ jobs:
 
       - name: Init TWA project
         run: |
-          echo "y" | npx @bubblewrap/cli init --manifest https://lexx79.github.io/driving-instructor-pwa/manifest.json --directory twa-build
+          yes | npx @bubblewrap/cli init --manifest https://lexx79.github.io/driving-instructor-pwa/manifest.json --directory twa-build
 
       - name: Build APK
         run: npx @bubblewrap/cli build --directory twa-build
