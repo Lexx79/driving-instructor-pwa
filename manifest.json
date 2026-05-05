@@ -21,5 +21,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "iconUrl": "https://lexx79.github.io/driving-instructor-pwa/icon-512.png"
 }
