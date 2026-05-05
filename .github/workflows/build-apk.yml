@@ -1,4 +1,4 @@
-﻿name: Build APK
+name: Build APK
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -19,9 +19,20 @@ jobs:
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
 
-      - name: Check CLI options
+      - name: Init TWA project
+        run: npx @bubblewrap/cli init --manifest https://lexx79.github.io/driving-instructor-pwa/manifest.json --directory twa-build
+
+      - name: Build APK
+        run: npx @bubblewrap/cli build --directory twa-build
+
+      - name: Find APK
         run: |
-          npx @bubblewrap/cli --help 2>&1
-          echo "=== BUILD HELP ==="
-          npx @bubblewrap/cli build --help 2>&1
-        continue-on-error: true
+          find . -name "*.apk" -type f
+          mkdir -p apk-output
+          find . -name "*.apk" -type f -exec cp {} apk-output/ \;
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: driving-instructor-apk
+          path: apk-output/
